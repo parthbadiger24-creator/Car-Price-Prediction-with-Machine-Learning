@@ -1,82 +1,67 @@
-# Car-Price-Prediction-with-Machine-Learning
-Regression analysis comparing Random Forest and XGBoost models for predicting used car selling prices
+# Car Price Prediction — RF vs XGBoost
 
-Overview
-This project implements and compares two ensemble machine learning models for predicting used car selling prices. The analysis demonstrates the effectiveness of tree-based regression approaches for automotive pricing prediction. Random Forest model achieved superior performance with mean squared error of 0.75 and coefficient of determination (R-squared) of 0.97, indicating the model explains 97 percent of the variance in car prices. Comparative evaluation against XGBoost provides insights into model selection criteria for regression tasks.
+> Regression benchmark on ~10,000 used-car listings comparing **Random Forest** and **XGBoost** for predicting sale price.
+>
+> **SSIM916 — Machine Learning for Social Data Science, University of Exeter**
 
-Key Results
-The Random Forest model achieved superior performance across evaluated metrics:
+---
 
-Random Forest Model:
+## 🎯 Problem
 
-Mean Squared Error (MSE): 0.75
+Accurate car pricing helps buyers, dealerships, insurers and lenders. This project builds and compares two ensemble regressors on a tabular listings dataset and analyses which features drive price most.
 
-R-squared (R2): 0.97
+## 📦 Dataset
 
-Performance: Explains 97% of price variance with normalized data
+- **Rows:** ~10,000 car listings
+- **Features (11):** `Brand`, `Model`, `Year`, `Engine Capacity`, `Fuel Type`, `Transmission`, `Mileage`, `Doors`, `Owners`
+- **Target:** `Price`
+- **Split:** 80 / 20 train / test (`random_state=42`)
 
-Training Time: Efficient on standard CPU hardware
+## 🧪 Methodology
 
-Inference Latency: Sub-second per prediction
+1. Label-encode categorical features (`Brand`, `Model`, `Fuel_Type`, `Transmission`)
+2. Handle nulls, normalise numeric columns
+3. Train two models with default-ish hyperparameters (`n_estimators=100`)
+4. Evaluate on held-out test set with **MSE** and **R²**
+5. Inspect feature importance from XGBoost
 
-XGBoost Model:
+## 📈 Results
 
-Mean Squared Error (MSE): 0.93
+| Model | MSE ↓ | R² ↑ |
+|---|---:|---:|
+| **XGBoost** | **65,564.60** | **0.99** |
+| Random Forest | 239,412.52 | 0.97 |
 
-R-squared (R2): 0.96
+> ⚠️ **Caveat:** the R² of ~0.99 is unusually high and likely reflects synthetic / near-clean data. In interviews I frame this as a *methodology* project (pipeline, benchmark, feature importance) rather than a claim about real-world generalisation.
 
-Performance: Explains 96% of price variance with normalized data
+**Why XGBoost wins here:** sequential boosting corrects prior residuals, L1+L2 regularisation controls overfitting, and the optimised histogram-based tree builder handles the tabular structure efficiently.
 
-Gradient Boosting Advantage: Better for complex feature interactions
+## 🧰 Tech Stack
 
-Trade-off: Slightly higher error but robust to outliers
+`Python` · `scikit-learn` · `xgboost` · `pandas` · `numpy` · `matplotlib`
 
-Comparative Analysis:
-The 0.18-point MSE difference represents an 19 percent improvement in prediction accuracy for Random Forest. Both models demonstrate strong predictive performance with R-squared exceeding 0.96, indicating reliable price estimation for practical automotive applications. The minimal variance between models (1 percentage point in R-squared) suggests ensemble methods are highly effective for this regression task.
+## 📁 Repo Structure
 
-Dataset Description
-The car pricing dataset contains 205 vehicle records with 26 features spanning multiple attribute categories. The dataset includes both numeric and categorical variables representing vehicle characteristics influencing market value.
+```text
+.
+├── notebooks/car_price_prediction.ipynb
+├── src/
+├── docs/Car_Price_Prediction_Report.pdf
+├── requirements.txt
+└── README.md
+```
 
-Dataset Composition:
+## ▶️ Reproduce
 
-Total Records: 205 cars
+```bash
+pip install -r requirements.txt
+jupyter lab notebooks/car_price_prediction.ipynb
+```
 
-Total Features: 26 variables
+## 📄 Report
 
-Feature Types: Numeric (13), Categorical (13)
+Full write-up → [`docs/Car_Price_Prediction_Report.pdf`](docs/Car_Price_Prediction_Report.pdf)
 
-Missing Data: Minimal, handled through appropriate imputation techniques
+---
 
-Price Range: Normalized to 0-1 scale for model training
-
-Feature Categories:
-
-Technical Specifications encompass engine displacement, horsepower, torque, fuel efficiency (miles per gallon), and transmission type (manual/automatic). Vehicle dimensions include length, width, height, and wheelbase measurements. Weight classification addresses curb weight and overall vehicle mass.
-
-Physical Characteristics include door count, body style (sedan, coupe, hatchback, wagon), color, and material composition. Convenience features enumerate power windows, locks, seats, and climate control systems. Safety apparatus covers airbags, anti-lock brakes, traction control, and stability systems.
-
-Market Factors incorporate vehicle age, mileage accumulation, service history availability, and prior collision reports. Brand prestige and geographic origin (import vs. domestic) influence valuation. Fuel type (gasoline, diesel, hybrid) contributes to operating cost assessments.
-
-Data Preprocessing:
-
-Numeric features underwent standardization through z-score normalization, converting to zero mean and unit variance. Categorical features were encoded using one-hot encoding for machine learning compatibility. Missing values were addressed using median imputation for numeric features and mode imputation for categorical attributes. Outliers in price and mileage were retained for robust model evaluation without artificial constraints.
-
-The dataset was partitioned into 80 percent training data (164 records) and 20 percent test data (41 records), maintaining random stratification across price ranges. This split enables rigorous evaluation of generalization performance on unseen vehicle profiles.
-
-Visualizations
-The project includes two critical visualizations providing model evaluation insights:
-
-Random Forest Actual vs. Predicted Prices: This scatter plot displays the relationship between actual car selling prices (horizontal axis) and predictions generated by the Random Forest model (vertical axis). The red dashed line represents perfect prediction accuracy. Data points clustering tightly along this line indicate accurate price forecasting. The visualization reveals Random Forest maintains high accuracy across the entire price spectrum, from low-value used cars near zero dollars to premium vehicles exceeding twenty thousand dollars. Minor deviations appear in the mid-to-high price range (8-15 thousand dollars), suggesting subtle underestimation for vehicles in this range. The overall pattern demonstrates consistent predictive reliability.
-
-Random Forest Feature Importance: This horizontal bar chart ranks the 26 features by their contribution to model predictions. The Present_Price variable dominates with an importance score exceeding 0.85, indicating this single feature accounts for approximately 85 percent of prediction variance. Year, Kms_Driven, and Car_Name contribute modestly with importance scores below 0.10. Categorical variables including Transmission, Seller_Type, Fuel_Type, and Owner classification show minimal importance. This hierarchical importance distribution reveals the model relies predominantly on current market price when predicting future selling price, with secondary reliance on vehicle age and accumulated mileage.
-
-Technical Stack
-Python 3.10 serves as the primary programming language for model development and evaluation. Scikit-learn 1.3 provides core machine learning implementations for both Random Forest and XGBoost model classes. The library includes preprocessing utilities, model evaluation metrics, and train-test split functionality.
-
-XGBoost 1.7 implements gradient boosting regression for comparative analysis. The library offers advanced regularization techniques and performance optimization features. Integration with scikit-learn interfaces enables direct performance comparison.
-
-Data processing utilized Pandas 2.1 for data loading, cleaning, and feature engineering. NumPy 1.24 provided numerical operations and array manipulation. Data visualization employed Matplotlib 3.8 for scatter plots, bar charts, and performance comparisons. Seaborn 0.13 enhanced visualization aesthetics through statistical plotting capabilities.
-
-Model evaluation metrics were computed through Scikit-learn's dedicated modules including mean squared error, mean absolute error, and coefficient of determination. Cross-validation employed five-fold stratified procedures to ensure robust performance assessment.
-
-The project was developed and tested on Windows 10 and macOS environments with standard CPU hardware. GPU acceleration was not necessary given the dataset size and model complexity.
+<sub>MIT-licensed · Author: [Parth Badiger](https://github.com/parthbadiger24-creator)</sub>
